@@ -1,0 +1,30 @@
+/* ==========================================================================
+   BeatBotAdmin - Dark Theme Stylesheet (Default)
+   ========================================================================== */
+
+:root, [data-theme="dark"] {
+  --bg-dark: #0A0B10;
+  --bg-surface: #12141F;
+  --bg-card: rgba(20, 23, 36, 0.75);
+  --bg-card-hover: rgba(30, 35, 52, 0.9);
+  --bg-glass: rgba(18, 21, 32, 0.7);
+  --bg-input: rgba(10, 11, 16, 0.8);
+  --bg-table-header: rgba(14, 16, 25, 0.95);
+  --bg-dropdown: #141724;
+
+  --border-light: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 45, 141, 0.4);
+
+  --text-main: #FFFFFF;
+  --text-muted: #9E9EA7;
+  --text-subtle: #6B6B7B;
+
+  --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6);
+  --glass-blur: blur(16px);
+
+  --btn-glass-bg: rgba(255, 255, 255, 0.06);
+  --btn-glass-hover: rgba(255, 45, 141, 0.15);
+  --toggle-bg: rgba(255, 255, 255, 0.15);
+  --tag-bg: rgba(255, 255, 255, 0.04);
+}
+

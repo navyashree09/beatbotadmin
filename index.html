@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BeatBotAdmin - Music Upload & Management Dashboard</title>
+  <meta name="description"
+    content="BeatBotAdmin - Official Music Upload Admin Panel powered by Firebase Firestore & Storage. Pink and Blue vibrant gradient design.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dark-theme.css">
+  <link rel="stylesheet" href="css/light-theme.css">
+</head>
+
+<body>
+
+  <!-- Animated Loading Screen -->
+  <div id="loading-screen">
+    <img src="images/logo.svg" class="loading-logo" alt="BeatBot Logo">
+    <div class="loading-spinner"></div>
+    <div style="font-weight: 700; letter-spacing: 1px; color: var(--text-muted); font-size: 0.9rem;">BEATBOT ADMIN</div>
+  </div>
+
+  <!-- Login Screen Overlay -->
+  <div id="login-screen-wrapper" class="login-screen-wrapper">
+    <div class="login-card">
+      <img src="images/logo.svg" class="login-logo" alt="BeatBot Logo">
+      <h1 class="login-title">BeatBot Admin</h1>
+      <div id="login-error-alert" class="login-error-alert">
+        Invalid username or password!
+      </div>
+
+      <form id="login-form" class="login-form" onsubmit="handleLoginSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <div class="input-with-icon">
+            <svg class="input-icon" viewBox="0 0 24 24">
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+            </svg>
+            <input type="text" id="login-username" class="form-control" placeholder="Username" required
+              autocomplete="username">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-with-icon">
+            <svg class="input-icon" viewBox="0 0 24 24">
+              <path
+                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+            </svg>
+            <input type="password" id="login-password" class="form-control" placeholder="Password" required
+              autocomplete="current-password">
+            <button type="button" class="toggle-pwd-btn" id="toggle-pwd-btn" onclick="togglePasswordVisibility()"
+              title="Show/Hide Password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-login">
+          Login
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <div id="app" style="display: none;">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand-container">
+        <img src="images/logo.svg" class="brand-logo-img" alt="BeatBot Logo">
+        <div class="brand-name">beatbot</div>
+      </div>
+
+      <ul class="nav-list">
+        <li>
+          <a class="nav-link active" data-target="dashboard">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-target="upload">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
+            </svg>
+            <span>Upload Music</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-target="library">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+            </svg>
+            <span>Music Library</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-target="playlists">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" />
+            </svg>
+            <span>Playlist Manager</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-target="master-data">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 2l-5.5 9h11zM17.5 17.5c0 1.93-1.57 3.5-3.5 3.5s-3.5-1.57-3.5-3.5 1.57-3.5 3.5 1.57 3.5 3.5zM3 13.5h6v6H3z" />
+            </svg>
+            <span>Master Data</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="theme-toggle-btn">
+          <!-- Icon populated dynamically -->
+        </button>
+        <button class="logout-btn-nav" onclick="handleLogout()" title="Log Out Admin">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile Navigation Backdrop Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
+      <!-- Sticky Navigation Header -->
+      <header class="top-header">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle Navigation Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+            </svg>
+          </button>
+          <div class="header-title-container">
+            <h1 id="page-title">Dashboard Overview</h1>
+            <p class="header-subtitle" id="page-subtitle" style="display: none;"></p>
+          </div>
+
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button class="btn btn-primary" onclick="switchView('upload')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFF">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+            Upload Track
+          </button>
+          <button class="logout-btn-nav" onclick="handleLogout()" title="Log Out Admin" style="padding: 8px 14px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+            </svg>
+            <span class="desktop-only-text">Logout</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Views Body -->
+      <div class="content-body">
+
+        <!-- 1. DASHBOARD VIEW -->
+        <section id="view-dashboard" class="page-view active">
+          <div class="stats-grid">
+            <div class="glass-card stat-card">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h3>Total Songs</h3>
+                <div class="stat-value" id="stat-total-songs">0</div>
+              </div>
+            </div>
+
+            <div class="glass-card stat-card">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h3>Total Artists</h3>
+                <div class="stat-value" id="stat-total-artists">0</div>
+              </div>
+            </div>
+
+            <div class="glass-card stat-card">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z" />
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h3>Total Playlists</h3>
+                <div class="stat-value" id="stat-total-playlists">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h2 style="font-size: 1.25rem;">Recently Uploaded Tracks</h2>
+              <button class="btn btn-sm btn-glass" onclick="switchView('library')">View Full Library</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Song & Artist</th>
+                    <th>Category</th>
+                    <th>Playlist</th>
+                    <th>Uploaded Time</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-recent-table">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. UPLOAD MUSIC VIEW -->
+        <section id="view-upload" class="page-view">
+          <form id="upload-music-form" onsubmit="submitMusicUpload(event)">
+            <div class="upload-grid">
+
+              <!-- Left Column: Image & Audio Drop Zones -->
+              <div>
+                <div class="form-group">
+                  <label class="form-label">Upload Cover Image <span class="req">*</span> (1000 × 1000 px)</label>
+                  <div class="cover-preview-wrapper" id="cover-preview-wrapper">
+                    <img id="cover-preview-img" alt="Cover Preview">
+                    <div class="cover-preview-placeholder" id="cover-preview-placeholder"
+                      style="text-align: center; padding: 20px;">
+                      <div class="stat-icon" style="margin: 0 auto 12px; width: 44px; height: 44px;">
+                        <svg viewBox="0 0 24 24">
+                          <path
+                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z" />
+                        </svg>
+                      </div>
+                      <div style="font-size: 0.95rem; font-weight: 700;">Choose Cover Image</div>
+                      <div style="font-size: 0.775rem; color: var(--text-muted); margin-top: 4px;">Required size: 1000 ×
+                        1000 px</div>
+                    </div>
+                  </div>
+                  <input type="file" id="cover-file-input" class="file-input" accept="image/*">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Upload Audio File <span class="req">*</span> (.mp3 / .mpeg, Max
+                    10MB)</label>
+                  <div class="drop-zone" id="mp3-drop-zone">
+                    <div class="stat-icon" style="margin: 0 auto 12px; width: 44px; height: 44px;">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
+                      </svg>
+                    </div>
+                    <div style="font-weight: 700; font-size: 0.95rem;" id="mp3-file-name">Drag & Drop MP3 / MPEG file
+                      here or click</div>
+                    <div style="font-size: 0.775rem; color: var(--text-muted); margin-top: 4px;" id="mp3-file-size">
+                      Maximum File Size: 10 MB</div>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary-pink); margin-top: 6px;"
+                      id="mp3-file-duration"></div>
+                  </div>
+                  <input type="file" id="mp3-file-input" class="file-input" accept="audio/mp3, audio/mpeg">
+                </div>
+              </div>
+
+              <!-- Right Column: Song Metadata Fields -->
+              <div class="glass-card">
+                <div class="form-group">
+                  <label class="form-label">Song Title <span class="req">*</span></label>
+                  <input type="text" id="upload-title" class="form-control" placeholder="e.g., Midnight Beat" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Artist Name <span class="req">*</span></label>
+                  <input type="text" id="upload-artist" class="form-control" placeholder="e.g., BeatBot Producer"
+                    required>
+                </div>
+
+                <div class="responsive-grid-2">
+                  <div class="form-group">
+                    <label class="form-label">Album (Optional)</label>
+                    <input type="text" id="upload-album" class="form-control" placeholder="e.g., Neon Lights Album">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Playlist (Optional)</label>
+                    <select id="upload-playlist" class="form-select"></select>
+                  </div>
+                </div>
+
+                <div class="responsive-grid-2">
+                  <div class="form-group">
+                    <label class="form-label">Language</label>
+                    <select id="upload-language" class="form-select"></select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <select id="upload-country" class="form-select"></select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Category / Genre <span class="req">*</span> (Select all that apply)</label>
+                  <div class="checkbox-grid" id="category-checkboxes">
+                    <!-- Checkboxes populated dynamically -->
+                  </div>
+                </div>
+
+                <div class="responsive-grid-3" style="margin-bottom: 20px;">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Release Date (Optional)</label>
+                    <input type="date" id="upload-release-date" class="form-control">
+                  </div>
+
+                  <div style="display: flex; align-items: center; margin-top: 24px;">
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="upload-featured">
+                      <span class="toggle-slider"></span>
+                      <span>Featured Track</span>
+                    </label>
+                  </div>
+
+                  <div style="display: flex; align-items: center; margin-top: 24px;">
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="upload-trending">
+                      <span class="toggle-slider"></span>
+                      <span>Trending Track</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Description (Optional)</label>
+                  <textarea id="upload-desc" class="form-control"
+                    placeholder="Add song notes or lyrics overview..."></textarea>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container" id="upload-progress-box">
+                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700;">
+                    <span id="upload-progress-text">Uploading files to Storage...</span>
+                  </div>
+                  <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="upload-progress-fill"></div>
+                  </div>
+                </div>
+
+                <div style="margin-top: 24px; text-align: right;">
+                  <button type="submit" class="btn btn-primary" id="btn-submit-upload">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFF">
+                      <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
+                    </svg>
+                    Upload Track
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <!-- 3. MUSIC LIBRARY VIEW -->
+        <section id="view-library" class="page-view">
+          <div class="table-toolbar">
+            <div class="search-box">
+              <svg class="search-icon" viewBox="0 0 24 24">
+                <path
+                  d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+              </svg>
+              <input type="text" id="library-search" class="form-control"
+                placeholder="Search by Song Title, Artist Name, Album..." oninput="applyLibraryFilters()">
+            </div>
+
+            <div class="filter-group">
+              <select id="filter-category" class="form-select" onchange="applyLibraryFilters()">
+                <option value="">All Categories</option>
+              </select>
+              <select id="filter-language" class="form-select" onchange="applyLibraryFilters()">
+                <option value="">All Languages</option>
+              </select>
+              <select id="filter-country" class="form-select" onchange="applyLibraryFilters()">
+                <option value="">All Countries</option>
+              </select>
+              <select id="filter-playlist" class="form-select" onchange="applyLibraryFilters()">
+                <option value="">All Playlists</option>
+              </select>
+              <select id="filter-sort" class="form-select" onchange="applyLibraryFilters()">
+                <option value="latest">Sort: Latest Upload</option>
+                <option value="oldest">Sort: Oldest Upload</option>
+                <option value="az">Sort: A-Z</option>
+                <option value="za">Sort: Z-A</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Cover</th>
+                  <th>Song Title</th>
+                  <th>Artist</th>
+                  <th>Category</th>
+                  <th>Language</th>
+                  <th>Country</th>
+                  <th>Playlist</th>
+                  <th>Duration</th>
+                  <th>Uploaded Time</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="library-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Control Bar -->
+          <div class="pagination-toolbar">
+            <div id="pagination-info">Showing tracks</div>
+            <div class="pagination-controls">
+              <select id="pagination-items-per-page" class="form-select" style="width: auto; padding: 6px 12px;"
+                onchange="renderLibraryTable()">
+                <option value="25">25 per page</option>
+                <option value="50">50 per page</option>
+                <option value="100">100 per page</option>
+              </select>
+              <button class="btn btn-sm btn-glass" id="btn-prev-page" onclick="changePage(-1)">Prev</button>
+              <button class="btn btn-sm btn-glass" id="btn-next-page" onclick="changePage(1)">Next</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. PLAYLIST MANAGER VIEW -->
+        <section id="view-playlists" class="page-view">
+          <div class="glass-card" style="margin-bottom: 32px;">
+            <h2 style="font-size: 1.2rem; margin-bottom: 16px;">Create New Playlist</h2>
+            <form id="create-playlist-form" onsubmit="createPlaylistSubmit(event)">
+              <div style="display: grid; grid-template-columns: 180px 1fr; gap: 20px;">
+                <div class="cover-preview-wrapper" id="playlist-cover-wrapper">
+                  <img id="playlist-cover-preview" alt="Playlist Cover">
+                  <div class="cover-preview-placeholder" id="playlist-cover-placeholder" style="text-align: center;">
+                    <div style="font-weight: 700;">+ Cover Image</div>
+                  </div>
+                  <input type="file" id="playlist-cover-input" class="file-input" accept="image/*">
+                </div>
+
+                <div>
+                  <div class="form-group">
+                    <label class="form-label">Playlist Name <span class="req">*</span></label>
+                    <input type="text" id="playlist-name" class="form-control" placeholder="e.g., Top Hits 2026"
+                      required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Playlist Description</label>
+                    <textarea id="playlist-desc" class="form-control" placeholder="Brief description..."
+                      style="min-height: 60px;"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Create Playlist</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Existing Playlists</h2>
+          <div class="playlists-grid-compact" id="playlists-grid-container">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+        <!-- 5. MASTER DATA VIEW -->
+        <section id="view-master-data" class="page-view">
+          <div class="glass-card">
+            <!-- Master Data Tabs -->
+            <div class="tabs-header">
+              <button class="tab-btn active" data-tab="category"
+                onclick="switchMasterTab('category')">Categories</button>
+              <button class="tab-btn" data-tab="language" onclick="switchMasterTab('language')">Languages</button>
+              <button class="tab-btn" data-tab="country" onclick="switchMasterTab('country')">Countries</button>
+            </div>
+
+            <!-- Toolbar: Add + Search -->
+            <div
+              style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+              <form onsubmit="addMasterItemSubmit(event)" style="display: flex; gap: 12px; flex: 1; min-width: 200px;">
+                <input type="text" id="add-master-item-input" class="form-control" placeholder="Add new entry..."
+                  required>
+                <button type="submit" class="btn btn-primary">+ Add</button>
+              </form>
+
+              <div class="search-box" style="max-width: 300px; width: 100%;">
+                <svg class="search-icon" viewBox="0 0 24 24">
+                  <path
+                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                </svg>
+                <input type="text" id="master-search-input" class="form-control" placeholder="Search entries..."
+                  oninput="renderActiveMasterTab()">
+              </div>
+            </div>
+
+            <!-- Items Grid -->
+            <div class="stats-grid" id="master-grid-container"
+              style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));">
+
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Floating Audio Preview Bar -->
+    <div class="audio-player-bar" id="audio-player-bar">
+      <div style="display: flex; align-items: center; gap: 14px; min-width: 220px;">
+        <img src="images/logo.png" id="player-cover" alt="Track Cover"
+          style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover;">
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem;" id="player-title">Track Title</div>
+          <div style="font-size: 0.775rem; color: var(--text-muted);" id="player-artist">Artist Name</div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; max-width: 500px;">
+        <button class="btn-play-pause" id="player-play-btn" title="Play / Pause">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFF">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </button>
+        <div
+          style="display: flex; align-items: center; gap: 10px; width: 100%; font-size: 0.75rem; color: var(--text-muted);">
+          <span id="player-current-time">00:00</span>
+          <input type="range" class="scrubber-range" id="player-scrubber" value="0" min="0" max="100">
+          <span id="player-total-time">00:00</span>
+        </div>
+      </div>
+
+      <div style="width: 200px;"></div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Edit Song Modal -->
+    <div class="modal-overlay" id="modal-edit-song">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">Edit Song Details</div>
+          <button class="modal-close-btn" onclick="closeEditSongModal()">&times;</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Song Title</label>
+          <input type="text" id="edit-song-title" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Artist Name</label>
+          <input type="text" id="edit-song-artist" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Album Name</label>
+          <input type="text" id="edit-song-album" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="edit-song-desc" class="form-control"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-glass" onclick="closeEditSongModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveEditSong()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Song Confirm Modal -->
+    <div class="modal-overlay" id="modal-delete-confirm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" style="color: var(--danger-red);">Delete Track</div>
+          <button class="modal-close-btn" onclick="closeDeleteConfirmModal()">&times;</button>
+        </div>
+        <p style="margin-bottom: 20px; color: var(--text-muted);">
+          Are you sure you want to permanently delete track <strong id="delete-song-title-text"
+            style="color: var(--text-main);"></strong>?
+        </p>
+        <div class="modal-footer">
+          <button class="btn btn-glass" onclick="closeDeleteConfirmModal()">Cancel</button>
+          <button class="btn btn-danger" onclick="confirmDeleteSong()">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Playlist Modal -->
+    <div class="modal-overlay" id="modal-edit-playlist">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">Edit Playlist</div>
+          <button class="modal-close-btn" onclick="closeEditPlaylistModal()">&times;</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Playlist Name</label>
+          <input type="text" id="edit-playlist-name" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="edit-playlist-desc" class="form-control"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-glass" onclick="closeEditPlaylistModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveEditPlaylist()">Save Playlist</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Playlist Confirm Modal -->
+    <div class="modal-overlay" id="modal-delete-playlist-confirm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" style="color: var(--danger-red);">Delete Playlist</div>
+          <button class="modal-close-btn" onclick="closeDeletePlaylistModal()">&times;</button>
+        </div>
+        <p style="margin-bottom: 20px; color: var(--text-muted);">
+          Are you sure you want to delete playlist <strong id="delete-playlist-name-text"
+            style="color: var(--text-main);"></strong>?
+        </p>
+        <div class="modal-footer">
+          <button class="btn btn-glass" onclick="closeDeletePlaylistModal()">Cancel</button>
+          <button class="btn btn-danger" onclick="confirmDeletePlaylist()">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Master Item Modal -->
+    <div class="modal-overlay" id="modal-edit-master-item">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">Edit Master Entry</div>
+          <button class="modal-close-btn" onclick="closeEditMasterItemModal()">&times;</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Entry Name</label>
+          <input type="text" id="edit-master-item-input" class="form-control">
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-glass" onclick="closeEditMasterItemModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveEditMasterItem()">Save Entry</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+  </div>
+
+  <!-- Firebase v10 Compat SDK Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+  <!-- App Custom Logic Scripts -->
+  <script src="js/firebase.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/upload.js"></script>
+  <script src="js/musiclibrary.js"></script>
+  <script src="js/playlists.js"></script>
+  <script src="js/masterdata.js"></script>
+</body>
+
+</html>
